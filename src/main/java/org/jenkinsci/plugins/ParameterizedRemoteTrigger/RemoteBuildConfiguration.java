@@ -970,24 +970,29 @@ public class RemoteBuildConfiguration extends Builder {
             // wait up to 5 seconds for the connection to be open
             connection.setConnectTimeout(5000);
             connection.connect();
-            
+           
+            InputStream is; 
             listener.getLogger().println("HTTP response code: " + connection.getResponseCode());
-            InputStream is;
+            if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
+                // Handle 404 explicitly - Jenkins server will return 404 if build number doesn't exist (yet)
+                listener.getLogger().println("Got 404, return null");
+                return null;
+            }
             try {
                 is = connection.getInputStream();
-                if (is == null) {
-                    is = connection.getErrorStream();
-                }
             } catch (FileNotFoundException e) {
                 // In case of a e.g. 404 status
                 is = connection.getErrorStream();
             }
- 
+            if (is == null) {
+                // TODO: review, this might not be needed 
+                listener.getLogger().println("No input or error stream, return null");
+                return null;
+            }
             BufferedReader rd = new BufferedReader(new InputStreamReader(is));
             String line;
             // String response = "";
             StringBuilder response = new StringBuilder();
-        
             while ((line = rd.readLine()) != null) {
                 response.append(line);
             }
