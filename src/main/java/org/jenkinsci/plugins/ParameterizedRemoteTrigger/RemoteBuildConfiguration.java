@@ -796,6 +796,8 @@ public class RemoteBuildConfiguration extends Builder {
     public JSONObject sendHTTPCall(String urlString, String requestType, AbstractBuild build, BuildListener listener)
             throws IOException {
         
+            listener.getLogger().println(requestType + " " + urlString);
+            
             return sendHTTPCall( urlString, requestType, build, listener, 1 );
     }
 
@@ -969,14 +971,18 @@ public class RemoteBuildConfiguration extends Builder {
             connection.setConnectTimeout(5000);
             connection.connect();
             
+            listener.getLogger().println("HTTP response code: " + connection.getResponseCode());
             InputStream is;
             try {
                 is = connection.getInputStream();
+                if (is == null) {
+                    is = connection.getErrorStream();
+                }
             } catch (FileNotFoundException e) {
                 // In case of a e.g. 404 status
                 is = connection.getErrorStream();
             }
-            
+ 
             BufferedReader rd = new BufferedReader(new InputStreamReader(is));
             String line;
             // String response = "";
