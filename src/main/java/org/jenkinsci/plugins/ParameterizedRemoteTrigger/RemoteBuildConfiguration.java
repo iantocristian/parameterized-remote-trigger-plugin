@@ -548,6 +548,14 @@ public class RemoteBuildConfiguration extends Builder {
 
         listener.getLogger().println("Triggering remote job now.");
         sendHTTPCall(triggerUrlString, "POST", build, listener);
+
+        // Sleep for 5 seconds (in ms so x 1000)
+        try {
+            Thread.sleep(5 * 1000);
+        } catch (InterruptedException e) {
+            this.failBuild(e, listener);
+        }	
+
         // Validate the build number via parameters
         foundIt: for (int tries = 3; tries > 0; tries--) {
             for (int buildNumber : new SearchPattern(nextBuildNumber, 2)) {
