@@ -597,6 +597,7 @@ public class RemoteBuildConfiguration extends Builder {
         
         //Have to form the string ourselves, as we might not get a response from non-parameterized builds
         String jobURL = remoteServerURL + "/job/" + this.encodeValue(jobName) + "/";
+        listener.getLogger().println("Remote build console: " + jobURL + Integer.toString(nextBuildNumber) + "/console");
 
         // This is only for Debug
         // This output whether there is another job running on the remote host that this job had conflicted with.
@@ -804,7 +805,8 @@ public class RemoteBuildConfiguration extends Builder {
     public JSONObject sendHTTPCall(String urlString, String requestType, AbstractBuild build, BuildListener listener)
             throws IOException {
         
-            listener.getLogger().println(requestType + " " + urlString);
+            // Only for Debug
+            // listener.getLogger().println(requestType + " " + urlString);
             
             return sendHTTPCall( urlString, requestType, build, listener, 1 );
     }
@@ -980,7 +982,10 @@ public class RemoteBuildConfiguration extends Builder {
             connection.connect();
            
             InputStream is; 
-            listener.getLogger().println("HTTP response code: " + connection.getResponseCode());
+
+            // Only for Debug
+            // listener.getLogger().println("HTTP response code: " + connection.getResponseCode());
+
             if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
                 // Handle 404 explicitly - Jenkins server will return 404 if build number doesn't exist (yet)
                 listener.getLogger().println("Got 404, return null");
